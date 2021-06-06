@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.FileIO;
 
 namespace ElectronicJournal
 {
@@ -26,8 +27,39 @@ namespace ElectronicJournal
 
         private void button1_Click(object sender, EventArgs e)
         {
-            MainForm main = new MainForm();
-            main.Show();
+            string logPath = @"" + textBox1.Text + ".csv";
+            FileInfo presentUser = new FileInfo(logPath);
+
+            if (textBox1.Text == "dekanat" && textBox2.Text == "dekanat")
+            {
+                DekanatForm dekanat = new DekanatForm();
+                dekanat.Show();
+            }
+            else if(presentUser.Exists)
+            {
+                string currentPassword;
+                using (TextFieldParser tfp = new TextFieldParser(logPath))
+                {
+                    tfp.TextFieldType = FieldType.Delimited;
+                    tfp.SetDelimiters(",");
+                    string[] password = tfp.ReadFields();
+                    currentPassword = password[1];
+                }
+                if (textBox2.Text == currentPassword)
+                {
+                    MainForm main = new MainForm();
+                    main.label1.Text += textBox1.Text;
+                    main.Show();
+                }
+                else
+                {
+                    MessageBox.Show("Вероятно, вы ввели неправильный пароль.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Такого пользователя не существует!");
+            }
         }
     }
 }
